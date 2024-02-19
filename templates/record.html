@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unmuted</title>
+    <style>
+        body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #F0EFFF, #E5FCFF, #D6F7FF, #C5F2FF, #B3EEFF);
+}
+
+.button-54 {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-transform: none;
+  text-align: center;
+  color: #333;
+  cursor: pointer;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background-color: #F0EFFF;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: all 0.2s ease-in-out;
+}
+
+.button-54:hover {
+  background-color: #E5FCFF;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+/* New media queries for different screen sizes */
+@media (max-width: 768px) {
+  .button-54 {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+
+  /* Adjust other elements as needed for smaller screens,
+     like reducing margin, padding, or font size */
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* Adjustments for medium-sized screens (tablets) */
+  .button-54 {
+    padding: 10px 20px;
+    font-size: 15px;
+  }
+}
+
+/* Add more media queries for larger screens if needed */
+
+    </style>
+</head>
+<body>
+    
+    <button class="button-54" onclick="startRecording()">Start Recording</button>
+    <button class="button-54" onclick="stopRecording()">Stop Recording</button>
+    <button class="button-54" onclick="playRecording()">Play Recording</button>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+    
+        async function startRecording() {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+    
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+    
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                
+            };
+    
+            mediaRecorder.start();
+        }
+    
+        function stopRecording() {
+            mediaRecorder.stop();
+        }
+    
+        function playRecording() {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            
+            audio.addEventListener('ended', () => {
+                // Delete the recording after it finishes playing
+                deleteRecording();
+            });
+    
+            audio.play();
+        }
+    
+        function deleteRecording() {
+            audioChunks = [];
+        }
+    </script>    
+</body>
+</html>
